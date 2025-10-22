@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
  * 3. 观察者模式：LiveData提供更简单的观察者模式实现
  * 4. 线程安全：LiveData确保在主线程更新UI
  */
-fun <T> StateFlow<StepChange<T>>.toLiveData(): LiveData<StepChange<T>> {
+fun <T> StateFlow<StepChange<T>?>.toLiveData(): LiveData<StepChange<T>?> {
     return this.asLiveData()
 }
 

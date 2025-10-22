@@ -38,11 +38,11 @@ object AdvancedDynamicStepExample {
 /**
  * 第一个步骤：演示在指定步骤前后添加步骤
  */
-class FirstStep<T> : BaseStep<T>() {
+class FirstStep : BaseStep<String>() {
     
     override fun getStepId(): String = "FirstStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("第一个步骤开始")
@@ -52,9 +52,9 @@ class FirstStep<T> : BaseStep<T>() {
         logI("当前数据: $currentData")
         
         // 创建要添加的步骤
-        val middleStep1 = MiddleStep1<T>()
-        val middleStep2 = MiddleStep2<T>()
-        val middleStep3 = MiddleStep3<T>()
+        val middleStep1 = MiddleStep1()
+        val middleStep2 = MiddleStep2()
+        val middleStep3 = MiddleStep3()
         
         // 演示不同的添加方式
         
@@ -71,7 +71,7 @@ class FirstStep<T> : BaseStep<T>() {
         logI("在 MiddleStep2 之前添加了 MiddleStep3")
         
         // 4. 直接添加步骤到末尾
-        val additionalStep = AdditionalStep<T>()
+        val additionalStep = AdditionalStep()
         addStep(additionalStep)
         logI("添加了额外步骤到末尾")
         
@@ -89,11 +89,11 @@ class FirstStep<T> : BaseStep<T>() {
 /**
  * 中间步骤1
  */
-class MiddleStep1<T> : BaseStep<T>() {
+class MiddleStep1 : BaseStep<String>() {
     
     override fun getStepId(): String = "MiddleStep1"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("中间步骤1开始")
@@ -113,11 +113,11 @@ class MiddleStep1<T> : BaseStep<T>() {
 /**
  * 中间步骤2
  */
-class MiddleStep2<T> : BaseStep<T>() {
+class MiddleStep2 : BaseStep<String>() {
     
     override fun getStepId(): String = "MiddleStep2"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("中间步骤2开始")
@@ -137,11 +137,11 @@ class MiddleStep2<T> : BaseStep<T>() {
 /**
  * 中间步骤3
  */
-class MiddleStep3<T> : BaseStep<T>() {
+class MiddleStep3 : BaseStep<String>() {
     
     override fun getStepId(): String = "MiddleStep3"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("中间步骤3开始")
@@ -161,11 +161,11 @@ class MiddleStep3<T> : BaseStep<T>() {
 /**
  * 最后一个步骤
  */
-class LastStep<T> : BaseStep<T>() {
+class LastStep : BaseStep<String>() {
     
     override fun getStepId(): String = "LastStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("最后一个步骤开始")
@@ -186,11 +186,11 @@ class LastStep<T> : BaseStep<T>() {
  * 条件性动态步骤示例
  * 根据条件在指定位置添加步骤
  */
-class ConditionalAdvancedStep<T> : BaseStep<T>() {
+class ConditionalAdvancedStep : BaseStep<String>() {
     
     override fun getStepId(): String = "ConditionalAdvancedStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("条件性高级步骤开始")
@@ -201,21 +201,21 @@ class ConditionalAdvancedStep<T> : BaseStep<T>() {
         when {
             data.toString().contains("permission") -> {
                 // 如果需要权限，添加权限步骤
-                val permissionStep = PermissionStep<T>()
+                val permissionStep = PermissionStep()
                 addStepAfter("ConditionalAdvancedStep", permissionStep)
                 logI("添加了权限步骤")
             }
             
             data.toString().contains("network") -> {
                 // 如果需要网络，添加网络步骤
-                val networkStep = NetworkStep<T>()
+                val networkStep = NetworkStep()
                 addStepAfter("ConditionalAdvancedStep", networkStep)
                 logI("添加了网络步骤")
             }
             
             data.toString().contains("validation") -> {
                 // 如果需要验证，添加验证步骤
-                val validationStep = ValidationStep<T>()
+                val validationStep = ValidationStep()
                 addStepAfter("ConditionalAdvancedStep", validationStep)
                 logI("添加了验证步骤")
             }
@@ -228,11 +228,11 @@ class ConditionalAdvancedStep<T> : BaseStep<T>() {
 /**
  * 权限步骤
  */
-class PermissionStep<T> : BaseStep<T>() {
+class PermissionStep : BaseStep<String>() {
     
     override fun getStepId(): String = "PermissionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("权限步骤开始")
@@ -245,11 +245,11 @@ class PermissionStep<T> : BaseStep<T>() {
 /**
  * 网络步骤
  */
-class NetworkStep<T> : BaseStep<T>() {
+class NetworkStep : BaseStep<String>() {
     
     override fun getStepId(): String = "NetworkStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("网络步骤开始")
@@ -262,11 +262,11 @@ class NetworkStep<T> : BaseStep<T>() {
 /**
  * 验证步骤
  */
-class ValidationStep<T> : BaseStep<T>() {
+class ValidationStep: BaseStep<String>() {
     
     override fun getStepId(): String = "ValidationStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("验证步骤开始")
@@ -279,11 +279,11 @@ class ValidationStep<T> : BaseStep<T>() {
 /**
  * 额外步骤
  */
-class AdditionalStep<T> : BaseStep<T>() {
+class AdditionalStep: BaseStep<String>() {
     
     override fun getStepId(): String = "AdditionalStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("额外步骤开始")

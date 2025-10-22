@@ -1,8 +1,4 @@
-package org.spark.stepstep.samples
-
-import org.spark.stepstep.BaseStep
-import org.spark.stepstep.StepApi
-import org.spark.stepstep.StepCompletionProvider
+package org.spark.stepstep
 
 /**
  * DAG循环依赖检测示例
@@ -122,81 +118,81 @@ object DAGValidationExample {
 }
 
 // 测试步骤类
-class StepA<T> : BaseStep<T>() {
+class StepA: BaseStep<String>() {
     override fun getStepId(): String = "StepA"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepA")
         finish()
     }
 }
 
-class StepB<T> : BaseStep<T>() {
+class StepB: BaseStep<String>() {
     override fun getStepId(): String = "StepB"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepB")
         finish()
     }
 }
 
-class StepC<T> : BaseStep<T>() {
+class StepC: BaseStep<String>() {
     override fun getStepId(): String = "StepC"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepC")
         finish()
     }
 }
 
-class StepD<T> : BaseStep<T>() {
+class StepD: BaseStep<String>() {
     override fun getStepId(): String = "StepD"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepD")
         finish()
     }
 }
 
-class StepE<T> : BaseStep<T>() {
+class StepE: BaseStep<String>() {
     override fun getStepId(): String = "StepE"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepE")
         finish()
     }
 }
 
-class StepF<T> : BaseStep<T>() {
+class StepF: BaseStep<String>() {
     override fun getStepId(): String = "StepF"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepF")
         finish()
     }
 }
 
-class StepG<T> : BaseStep<T>() {
+class StepG: BaseStep<String>() {
     override fun getStepId(): String = "StepG"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepG")
         finish()
     }
 }
 
-class StepH<T> : BaseStep<T>() {
+class StepH: BaseStep<String>() {
     override fun getStepId(): String = "StepH"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepH")
         finish()
     }
 }
 
-class StepI<T> : BaseStep<T>() {
+class StepI: BaseStep<String>() {
     override fun getStepId(): String = "StepI"
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行StepI")
         finish()

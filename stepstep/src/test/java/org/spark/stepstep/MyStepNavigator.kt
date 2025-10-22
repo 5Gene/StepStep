@@ -3,6 +3,7 @@ package org.spark.stepstep
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import okio.Sink
 import org.spark.stepstep.StepApi
 import org.spark.stepstep.StepChange
 import org.spark.stepstep.StepEngine
@@ -32,17 +33,17 @@ class StepNavigator private constructor(private val context: Context) {
         }
     }
     
-    private lateinit var currentStepLiveData: LiveData<StepChange?>
+    private lateinit var currentStepLiveData: LiveData<StepChange<String>?>
     
     /**
      * 步骤变化观察者
      * 负责根据当前步骤进行导航
      */
-    private val StepStepChangeObserver = Observer<StepChange?> { stepChange ->
+    private val StepStepChangeObserver = Observer<StepChange<String>?> { stepChange ->
         stepChange?.let { navigate(it) }
     }
     
-    private lateinit var StepEngine: StepEngine
+    private lateinit var StepEngine: StepEngine<String>
     
     private var resultCallback: ((Boolean, String?) -> Unit)? = null
     
@@ -54,7 +55,7 @@ class StepNavigator private constructor(private val context: Context) {
      * @param skipWelcome 是否跳过欢迎页面
      * @param result 结果回调
      */
-    fun startStep(
+    suspend fun startStep(
         deviceMac: String,
         deviceModel: String,
         skipWelcome: Boolean = false,
@@ -69,7 +70,7 @@ class StepNavigator private constructor(private val context: Context) {
         resultCallback = result
         
         // 构建Step流程
-        StepEngine = StepApi.createStepEngineBuilder()
+        StepEngine = StepApi.createStepEngineBuilder<String>()
             .apply {
                 // 欢迎步骤（可选）
                 if (!skipWelcome) {
@@ -107,7 +108,7 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 根据步骤变化进行导航
      */
-    private fun navigate(stepChange: StepChange) {
+    private fun navigate(stepChange: StepChange<String>) {
         println("[$TAG] Step: ${stepChange.currentStep?.getStepId()}, " +
                 "Type: ${stepChange.changeType}, " +
                 "Progress: ${stepChange.currentIndex + 1}/${stepChange.totalSteps}")
@@ -146,7 +147,7 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 处理步骤前进
      */
-    private fun handleStepForward(stepChange: StepChange) {
+    private fun handleStepForward(stepChange: StepChange<String>) {
         when (val step = stepChange.currentStep) {
             is WelcomeStepStep -> {
                 println("[$TAG] 显示欢迎页面")
@@ -187,7 +188,7 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 处理步骤后退
      */
-    private fun handleStepBackward(stepChange: StepChange) {
+    private fun handleStepBackward(stepChange: StepChange<String>) {
         println("[$TAG] 返回到步骤: ${stepChange.currentStep?.getStepId()}")
         // 可以在这里处理返回时的特殊逻辑
     }
@@ -195,7 +196,7 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 获取当前步骤
      */
-    fun getCurrentStep(): StepStep? {
+    fun getCurrentStep(): StepStep<String>? {
         if (!this::StepEngine.isInitialized) {
             println("[$TAG] getCurrentStep: StepEngine not initialized")
             return null
@@ -206,7 +207,7 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 中止Step流程
      */
-    fun abort() {
+    suspend fun abort() {
         if (!this::StepEngine.isInitialized) {
             println("[$TAG] abort: StepEngine not initialized")
             return

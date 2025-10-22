@@ -57,163 +57,164 @@ object IdBasedDynamicStepExample {
             }
             .start("初始数据")
     }
-}
 
-/**
- * 欢迎步骤
- */
-class WelcomeStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "WelcomeStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("欢迎步骤开始")
-        
-        val currentData = getData()
-        logI("当前数据: $currentData")
-        
-        // 模拟处理
-        delay(500)
-        
-        setData("WelcomeStep处理后的数据")
-        
-        finish()
-    }
-}
+    /**
+     * 欢迎步骤
+     */
+    class WelcomeStep: BaseStep<String>() {
 
-/**
- * 权限步骤
- */
-class PermissionStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "PermissionStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("权限步骤开始")
-        
-        val currentData = getData()
-        logI("当前数据: $currentData")
-        
-        // 模拟权限检查
-        delay(1000)
-        
-        setData("PermissionStep处理后的数据")
-        
-        finish()
-    }
-}
+        override fun getStepId(): String = "WelcomeStep"
 
-/**
- * 验证步骤
- */
-class ValidationStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "ValidationStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("验证步骤开始")
-        
-        val currentData = getData()
-        logI("当前数据: $currentData")
-        
-        // 模拟数据验证
-        delay(800)
-        
-        setData("ValidationStep处理后的数据")
-        
-        finish()
-    }
-}
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
 
-/**
- * 最后一个步骤
- */
-class LastStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "LastStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("最后一个步骤开始")
-        
-        val currentData = getData()
-        logI("最终数据: $currentData")
-        
-        // 模拟最终处理
-        delay(500)
-        
-        setData("最终处理完成的数据")
-        
-        finish()
-    }
-}
+            logI("欢迎步骤开始")
 
-/**
- * 运行时动态步骤示例
- */
-class RuntimeDynamicStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "RuntimeDynamicStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("运行时动态步骤开始")
-        
-        // 根据条件动态添加步骤
-        val data = getData()
-        
-        when {
-            data.toString().contains("permission") -> {
-                // 通过ID在指定位置添加步骤
-                addStepAfter("WelcomeStep", PermissionStep<T>())
-                logI("在WelcomeStep之后添加了PermissionStep")
-            }
-            
-            data.toString().contains("validation") -> {
-                // 通过ID在指定位置添加步骤
-                addStepBefore("LastStep", ValidationStep<T>())
-                logI("在LastStep之前添加了ValidationStep")
-            }
-            
-            data.toString().contains("network") -> {
-                // 通过ID在指定位置添加步骤
-                addStepAfter("PermissionStep", NetworkStep<T>())
-                logI("在PermissionStep之后添加了NetworkStep")
-            }
+            val currentData = getData()
+            logI("当前数据: $currentData")
+
+            // 模拟处理
+            delay(500)
+
+            setData("WelcomeStep处理后的数据")
+
+            finish()
         }
-        
-        finish()
+    }
+
+    /**
+     * 权限步骤
+     */
+    class PermissionStep: BaseStep<String>() {
+
+        override fun getStepId(): String = "PermissionStep"
+
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
+
+            logI("权限步骤开始")
+
+            val currentData = getData()
+            logI("当前数据: $currentData")
+
+            // 模拟权限检查
+            delay(1000)
+
+            setData("PermissionStep处理后的数据")
+
+            finish()
+        }
+    }
+
+    /**
+     * 验证步骤
+     */
+    class ValidationStep: BaseStep<String>() {
+
+        override fun getStepId(): String = "ValidationStep"
+
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
+
+            logI("验证步骤开始")
+
+            val currentData = getData()
+            logI("当前数据: $currentData")
+
+            // 模拟数据验证
+            delay(800)
+
+            setData("ValidationStep处理后的数据")
+
+            finish()
+        }
+    }
+
+    /**
+     * 最后一个步骤
+     */
+    class LastStep: BaseStep<String>() {
+
+        override fun getStepId(): String = "LastStep"
+
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
+
+            logI("最后一个步骤开始")
+
+            val currentData = getData()
+            logI("最终数据: $currentData")
+
+            // 模拟最终处理
+            delay(500)
+
+            setData("最终处理完成的数据")
+
+            finish()
+        }
+    }
+
+    /**
+     * 运行时动态步骤示例
+     */
+    class RuntimeDynamicStep: BaseStep<String>() {
+
+        override fun getStepId(): String = "RuntimeDynamicStep"
+
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
+
+            logI("运行时动态步骤开始")
+
+            // 根据条件动态添加步骤
+            val data = getData()
+
+            when {
+                data.toString().contains("permission") -> {
+                    // 通过ID在指定位置添加步骤
+                    addStepAfter("WelcomeStep", PermissionStep())
+                    logI("在WelcomeStep之后添加了PermissionStep")
+                }
+
+                data.toString().contains("validation") -> {
+                    // 通过ID在指定位置添加步骤
+                    addStepBefore("LastStep", ValidationStep())
+                    logI("在LastStep之前添加了ValidationStep")
+                }
+
+                data.toString().contains("network") -> {
+                    // 通过ID在指定位置添加步骤
+                    addStepAfter("PermissionStep", NetworkStep())
+                    logI("在PermissionStep之后添加了NetworkStep")
+                }
+            }
+
+            finish()
+        }
+    }
+
+    /**
+     * 网络步骤
+     */
+    class NetworkStep: BaseStep<String>() {
+
+        override fun getStepId(): String = "NetworkStep"
+
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
+            super.onStepStarted(stepCompletionProvider)
+
+            logI("网络步骤开始")
+
+            val currentData = getData()
+            logI("当前数据: $currentData")
+
+            // 模拟网络连接
+            delay(1200)
+
+            setData("NetworkStep处理后的数据")
+
+            finish()
+        }
     }
 }
 
-/**
- * 网络步骤
- */
-class NetworkStep<T> : BaseStep<T>() {
-    
-    override fun getStepId(): String = "NetworkStep"
-    
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
-        super.onStepStarted(stepCompletionProvider)
-        
-        logI("网络步骤开始")
-        
-        val currentData = getData()
-        logI("当前数据: $currentData")
-        
-        // 模拟网络连接
-        delay(1200)
-        
-        setData("NetworkStep处理后的数据")
-        
-        finish()
-    }
-}

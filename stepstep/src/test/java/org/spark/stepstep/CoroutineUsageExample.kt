@@ -192,7 +192,7 @@ object CoroutineUsageExample {
     /**
      * 示例8：自定义业务步骤
      */
-    class CustomBusinessStep<T> : BaseStep<T>() {
+    class CustomBusinessStep: BaseStep<String>() {
         
         override fun getStepId(): String = "CustomBusinessStep"
         
@@ -202,7 +202,7 @@ object CoroutineUsageExample {
             return checkBusinessCondition()
         }
         
-        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
             super.onStepStarted(stepCompletionProvider)
             
             logI("开始执行业务逻辑")
@@ -218,7 +218,7 @@ object CoroutineUsageExample {
             }
         }
         
-        override suspend fun onStepResumed(stepCompletionProvider: StepCompletionProvider) {
+        override suspend fun onStepResumed(stepCompletionProvider: StepCompletionProvider<String>) {
             super.onStepResumed(stepCompletionProvider)
             
             // 从后续步骤返回时，可能需要刷新UI

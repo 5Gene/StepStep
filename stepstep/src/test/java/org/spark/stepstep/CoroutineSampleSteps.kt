@@ -85,7 +85,7 @@ class CoroutinePermissionStep(
         return true
     }
     
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         return !isPermissionGranted
     }
 }
@@ -93,9 +93,9 @@ class CoroutinePermissionStep(
 /**
  * 示例步骤3：设备连接（协程版本）
  */
-class CoroutineDeviceConnectionStep<T>(
+class CoroutineDeviceConnectionStep(
     private val deviceMac: String
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     
     private var isConnecting = false
     
@@ -240,7 +240,7 @@ class CoroutineConditionalStep(
 /**
  * 示例步骤7：错误处理步骤
  */
-class ErrorHandlingStep<T> : BaseStep<T>() {
+class ErrorHandlingStep: BaseStep<String>() {
     
     override fun getStepId(): String = "ErrorHandlingStep"
     
@@ -277,7 +277,7 @@ class ErrorHandlingStep<T> : BaseStep<T>() {
 /**
  * 示例步骤8：动态步骤管理
  */
-class DynamicStepManagementStep<T> : BaseStep<T>() {
+class DynamicStepManagementStep: BaseStep<String>() {
     
     override fun getStepId(): String = "DynamicStepManagementStep"
     

@@ -23,7 +23,7 @@ interface StepStep<T> {
      * 
      * @return true-步骤可用，false-跳过该步骤
      */
-    fun isAvailable(): Boolean = true
+    suspend fun isAvailable(): Boolean = true
     
     /**
      * 步骤开始执行

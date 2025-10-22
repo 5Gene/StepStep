@@ -38,11 +38,11 @@ object DynamicStepExample {
 /**
  * 第一个步骤：会动态添加中间步骤
  */
-class FirstStep<T> : BaseStep<T>() {
+class FirstStep: BaseStep<String>() {
     
     override fun getStepId(): String = "FirstStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("第一个步骤开始执行")
@@ -61,7 +61,7 @@ class FirstStep<T> : BaseStep<T>() {
         
         // 动态添加中间步骤
         logI("动态添加中间步骤")
-        val middleStep = MiddleStep<T>()
+        val middleStep = MiddleStep()
         addStep(middleStep)
         
         logI("第一个步骤完成，进入下一步")
@@ -72,11 +72,11 @@ class FirstStep<T> : BaseStep<T>() {
 /**
  * 中间步骤：动态添加的步骤
  */
-class MiddleStep<T> : BaseStep<T>() {
+class MiddleStep: BaseStep<String>() {
     
     override fun getStepId(): String = "MiddleStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("中间步骤开始执行（这是动态添加的步骤）")
@@ -95,7 +95,7 @@ class MiddleStep<T> : BaseStep<T>() {
         
         // 可以继续动态添加更多步骤
         logI("动态添加额外步骤")
-        val extraStep = ExtraStep<T>()
+        val extraStep = ExtraStep()
         addStep(extraStep)
         
         logI("中间步骤完成，进入下一步")
@@ -106,11 +106,11 @@ class MiddleStep<T> : BaseStep<T>() {
 /**
  * 额外步骤：在中间步骤中动态添加的步骤
  */
-class ExtraStep<T> : BaseStep<T>() {
+class ExtraStep: BaseStep<String>() {
     
     override fun getStepId(): String = "ExtraStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("额外步骤开始执行（这是第二个动态添加的步骤）")
@@ -135,11 +135,11 @@ class ExtraStep<T> : BaseStep<T>() {
 /**
  * 最后一个步骤
  */
-class LastStep<T> : BaseStep<T>() {
+class LastStep: BaseStep<String>() {
     
     override fun getStepId(): String = "LastStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("最后一个步骤开始执行")
@@ -159,11 +159,11 @@ class LastStep<T> : BaseStep<T>() {
 /**
  * 示例2：条件性动态添加步骤
  */
-class ConditionalDynamicStep<T> : BaseStep<T>() {
+class ConditionalDynamicStep: BaseStep<String>() {
     
     override fun getStepId(): String = "ConditionalDynamicStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("条件性动态步骤开始执行")
@@ -178,12 +178,12 @@ class ConditionalDynamicStep<T> : BaseStep<T>() {
         
         if (shouldAddPermissionStep) {
             logI("需要权限，动态添加权限步骤")
-            addStep(PermissionStep<T>())
+            addStep(PermissionStep())
         }
         
         if (shouldAddNetworkStep) {
             logI("需要网络，动态添加网络步骤")
-            addStep(NetworkStep<T>())
+            addStep(NetworkStep())
         }
         
         // 修改数据
@@ -210,11 +210,11 @@ class ConditionalDynamicStep<T> : BaseStep<T>() {
 /**
  * 权限步骤
  */
-class PermissionStep<T> : BaseStep<T>() {
+class PermissionStep: BaseStep<String>() {
     
     override fun getStepId(): String = "PermissionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("权限步骤执行")
@@ -231,11 +231,11 @@ class PermissionStep<T> : BaseStep<T>() {
 /**
  * 网络步骤
  */
-class NetworkStep<T> : BaseStep<T>() {
+class NetworkStep: BaseStep<String>() {
     
     override fun getStepId(): String = "NetworkStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("网络步骤执行")
@@ -252,20 +252,20 @@ class NetworkStep<T> : BaseStep<T>() {
 /**
  * 示例3：在步骤中动态添加多个步骤
  */
-class MultiDynamicStep<T> : BaseStep<T>() {
+class MultiDynamicStep: BaseStep<String>() {
     
     override fun getStepId(): String = "MultiDynamicStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("多步骤动态添加开始执行")
         
         // 动态添加多个步骤
         val stepsToAdd = listOf(
-            Step1<T>(),
-            Step2<T>(),
-            Step3<T>()
+            Step1(),
+            Step2(),
+            Step3()
         )
         
         stepsToAdd.forEach { step ->
@@ -284,10 +284,10 @@ class MultiDynamicStep<T> : BaseStep<T>() {
     }
 }
 
-class Step1<T> : BaseStep<T>() {
+class Step1: BaseStep<String>() {
     override fun getStepId(): String = "Step1"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("Step1 执行")
         delay(300)
@@ -295,10 +295,10 @@ class Step1<T> : BaseStep<T>() {
     }
 }
 
-class Step2<T> : BaseStep<T>() {
+class Step2: BaseStep<String>() {
     override fun getStepId(): String = "Step2"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("Step2 执行")
         delay(300)
@@ -306,10 +306,10 @@ class Step2<T> : BaseStep<T>() {
     }
 }
 
-class Step3<T> : BaseStep<T>() {
+class Step3: BaseStep<String>() {
     override fun getStepId(): String = "Step3"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("Step3 执行")
         delay(300)

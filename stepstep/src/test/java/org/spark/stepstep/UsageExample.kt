@@ -20,7 +20,7 @@ object UsageExample {
      * 
      * 创建一个简单的Step流程
      */
-    fun basicUsage() {
+    suspend fun basicUsage() {
         // 1. 创建Step引擎
         val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
@@ -49,7 +49,7 @@ object UsageExample {
      * 
      * 在现有步骤之间插入新步骤
      */
-    fun dynamicInsertionUsage() {
+    suspend fun dynamicInsertionUsage() {
         val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
@@ -75,7 +75,7 @@ object UsageExample {
     /**
      * 示例3：使用Kotlin reified类型的便捷API
      */
-    fun reifiedTypeUsage() {
+   suspend fun reifiedTypeUsage() {
         val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
@@ -100,7 +100,7 @@ object UsageExample {
     /**
      * 示例4：使用便捷方法
      */
-    fun convenientUsage() {
+   suspend fun convenientUsage() {
         val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(PermissionStepStep(listOf("android.permission.BLUETOOTH")))
@@ -120,7 +120,7 @@ object UsageExample {
      * 
      * 根据条件决定是否执行某些步骤
      */
-    fun conditionalStepUsage() {
+    suspend fun conditionalStepUsage() {
         val needPermission = true
         val isFirstTimeStep = true
         
@@ -147,7 +147,7 @@ object UsageExample {
      * 
      * 在Activity/Fragment中使用，完整的生命周期管理
      */
-    fun fullLifecycleUsage(lifecycleOwner: LifecycleOwner) {
+   suspend fun fullLifecycleUsage(lifecycleOwner: LifecycleOwner) {
         // 创建引擎
         val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
@@ -176,9 +176,9 @@ object UsageExample {
      * 
      * 演示如何避免插入冲突
      */
-    fun multiModuleUsage() {
+    suspend fun multiModuleUsage() {
         // 基础Step流程
-        val builder = StepApi.createStepEngineBuilder()
+        val builder = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
             .addStep(CompleteStepStep())
@@ -223,7 +223,7 @@ object UsageExample {
     /**
      * 处理步骤变化
      */
-    private fun handleStepChange(stepChange: StepChange) {
+    private suspend fun handleStepChange(stepChange: StepChange<String>) {
         when (stepChange.changeType) {
             StepChange.ChangeType.STARTED -> {
                 println("Step流程开始")
@@ -274,16 +274,16 @@ object UsageExample {
     /**
      * 示例8：自定义步骤实现
      */
-    class CustomBusinessStep : BaseStep() {
+    class CustomBusinessStep : BaseStep<String>() {
         
         override fun getStepId(): String = "CustomBusinessStep"
         
-        override fun isAvailable(): Boolean {
+        override suspend fun isAvailable(): Boolean {
             // 根据业务逻辑决定是否显示此步骤
             return checkBusinessCondition()
         }
         
-        override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+        override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
             super.onStepStarted(stepCompletionProvider)
             
             logI("开始执行业务逻辑")
@@ -301,21 +301,21 @@ object UsageExample {
             }
         }
         
-        override fun onStepResumed(stepCompletionProvider: StepCompletionProvider) {
+        override suspend fun onStepResumed(stepCompletionProvider: StepCompletionProvider<String>) {
             super.onStepResumed(stepCompletionProvider)
             
             // 从后续步骤返回时，可能需要刷新UI
             logI("步骤恢复，刷新UI")
         }
         
-        override fun onStepStopped() {
+        override suspend fun onStepStopped() {
             super.onStepStopped()
             
             // 步骤停止，保存状态或取消操作
             logI("步骤停止，保存状态")
         }
         
-        override fun cleanup() {
+        override suspend fun cleanup() {
             super.cleanup()
             
             // 清理资源
@@ -327,7 +327,7 @@ object UsageExample {
             return true
         }
         
-        private fun performBusinessLogic(callback: (Boolean) -> Unit) {
+        private suspend fun performBusinessLogic(callback: suspend (Boolean) -> Unit) {
             // 执行业务逻辑
             callback(true)
         }

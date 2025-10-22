@@ -135,7 +135,7 @@ object CompleteUsageExample {
  * 示例步骤实现
  */
 
-class WelcomeStep<T> : BaseStep<T>() {
+class WelcomeStep: BaseStep<String>() {
     override fun getStepId(): String = "WelcomeStep"
     
     override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {

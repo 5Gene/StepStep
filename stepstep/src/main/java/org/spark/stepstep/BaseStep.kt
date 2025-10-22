@@ -113,7 +113,7 @@ abstract class BaseStep<T> : StepStep<T> {
      * 
      * @return true-步骤会执行，false-步骤会被跳过
      */
-    override fun isAvailable(): Boolean = true
+    override suspend fun isAvailable(): Boolean = true
     
     /**
      * 完成当前步骤

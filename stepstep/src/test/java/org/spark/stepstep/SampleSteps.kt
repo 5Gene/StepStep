@@ -27,7 +27,7 @@ class WelcomeStepStep : BaseStep<String>() {
         // finish()
     }
     
-    override suspend fun isAvailable(): Boolean {
+    override fun isAvailable(): Boolean {
         // 可以根据条件决定是否显示此步骤
         return true
     }
