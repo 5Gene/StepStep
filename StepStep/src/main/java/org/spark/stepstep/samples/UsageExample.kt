@@ -7,8 +7,6 @@ import org.spark.stepstep.BaseStep
 import org.spark.stepstep.StepApi
 import org.spark.stepstep.StepChange
 import org.spark.stepstep.StepCompletionProvider
-import org.spark.stepstep.createStepEngineBuilder
-import org.spark.stepstep.toLiveData
 
 /**
  * Step框架使用示例
@@ -24,7 +22,7 @@ object UsageExample {
      */
     fun basicUsage() {
         // 1. 创建Step引擎
-        val engine = StepApi.createStepEngineBuilder()
+        val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(PermissionStepStep(listOf("android.permission.BLUETOOTH")))
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
@@ -39,8 +37,11 @@ object UsageExample {
         //     }
         // }
         
-        // 3. 启动Step流程
-        engine.start()
+        // 3. 启动Step流程（链式调用）
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**
@@ -49,58 +50,69 @@ object UsageExample {
      * 在现有步骤之间插入新步骤
      */
     fun dynamicInsertionUsage() {
-        val engine = StepApi.createStepEngineBuilder()
+        val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
             .addStep(CompleteStepStep())
             // 在WelcomeStepStep之后插入权限步骤
             .addStepAfter(
-                WelcomeStepStep::class.java,
+                "WelcomeStepStep",
                 PermissionStepStep(listOf("android.permission.BLUETOOTH"))
             )
             // 在CompleteStepStep之前插入配置同步步骤
             .addStepBefore(
-                CompleteStepStep::class.java,
+                "CompleteStepStep",
                 ConfigSyncStepStep()
             )
             .build()
         
-        engine.start()
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**
      * 示例3：使用Kotlin reified类型的便捷API
      */
     fun reifiedTypeUsage() {
-        val engine = StepApi.createStepEngineBuilder()
+        val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
             .addStep(CompleteStepStep())
-            // 使用reified类型，更简洁
-            .addStepAfter<WelcomeStepStep>(
+            // 使用ID-based API
+            .addStepAfter(
+                "WelcomeStepStep",
                 PermissionStepStep(listOf("android.permission.BLUETOOTH"))
             )
-            .addStepBefore<CompleteStepStep>(
+            .addStepBefore(
+                "CompleteStepStep",
                 ConfigSyncStepStep()
             )
             .build()
         
-        engine.start()
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**
-     * 示例4：使用DSL风格
+     * 示例4：使用便捷方法
      */
-    fun dslStyleUsage() {
-        val engine = StepApi.createStepEngineBuilder {
-            step(WelcomeStepStep())
-            step(PermissionStepStep(listOf("android.permission.BLUETOOTH")))
-            step(DeviceConnectionStepStep("00:11:22:33:44:55"))
-            step(ConfigSyncStepStep())
-            step(CompleteStepStep())
-        }.build()
+    fun convenientUsage() {
+        val engine = StepApi.createStepEngineBuilder<String>()
+            .addStep(WelcomeStepStep())
+            .addStep(PermissionStepStep(listOf("android.permission.BLUETOOTH")))
+            .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
+            .addStep(ConfigSyncStepStep())
+            .addStep(CompleteStepStep())
+            .build()
         
-        engine.start()
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**
@@ -112,7 +124,7 @@ object UsageExample {
         val needPermission = true
         val isFirstTimeStep = true
         
-        val engine = StepApi.createStepEngineBuilder()
+        val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(
                 ConditionalStepStep { needPermission }
@@ -124,7 +136,10 @@ object UsageExample {
             .addStep(CompleteStepStep())
             .build()
         
-        engine.start()
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**
@@ -134,7 +149,7 @@ object UsageExample {
      */
     fun fullLifecycleUsage(lifecycleOwner: LifecycleOwner) {
         // 创建引擎
-        val engine = StepApi.createStepEngineBuilder()
+        val engine = StepApi.createStepEngineBuilder<String>()
             .addStep(WelcomeStepStep())
             .addStep(PermissionStepStep(listOf("android.permission.BLUETOOTH")))
             .addStep(DeviceConnectionStepStep("00:11:22:33:44:55"))
@@ -142,21 +157,18 @@ object UsageExample {
             .addStep(CompleteStepStep())
             .build()
         
-        // 使用LiveData监听步骤变化
-        val stepChangeLiveData = engine.getStepChangeFlow().toLiveData()
-        stepChangeLiveData.observe(lifecycleOwner) { stepChange ->
-            stepChange?.let { handleStepChange(it) }
-        }
-        
-        // 或者使用Flow在协程中监听
+        // 使用Flow在协程中监听
         lifecycleOwner.lifecycleScope.launch {
             engine.getStepChangeFlow().collect { stepChange ->
                 stepChange?.let { handleStepChange(it) }
             }
         }
         
-        // 启动Step流程
-        engine.start()
+        // 启动Step流程（链式调用）
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**

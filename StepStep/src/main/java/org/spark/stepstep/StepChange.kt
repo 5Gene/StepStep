@@ -4,19 +4,20 @@ package org.spark.stepstep
  * 步骤变化数据类
  * 
  * 用于通知外部观察者当前步骤的变化
+ * 支持泛型数据传递
  */
-data class StepChange(
+data class StepChange<T>(
     /**
      * 当前步骤
      * null表示Step流程已结束
      */
-    val currentStep: StepStep?,
+    val currentStep: StepStep<T>?,
 
     /**
      * 上一个步骤
      * null表示这是第一个步骤
      */
-    val previousStep: StepStep?,
+    val previousStep: StepStep<T>?,
 
     /**
      * 当前步骤在所有步骤中的索引（从0开始）

@@ -5,6 +5,7 @@ package org.spark.stepstep
  * 
  * 提供创建Step引擎的入口
  * 这是整个Step框架的入口点
+ * 支持协程和泛型数据传递
  */
 object StepApi {
     
@@ -13,7 +14,7 @@ object StepApi {
      * 
      * @return Step引擎构建器实例
      */
-    fun createStepEngineBuilder(): StepEngineBuilder {
+    fun <T> createStepEngineBuilder(): StepEngineBuilder<T> {
         return StepEngineBuilder()
     }
     
@@ -23,8 +24,8 @@ object StepApi {
      * @param initialSteps 初始步骤列表
      * @return Step引擎构建器实例
      */
-    fun createStepEngineBuilder(vararg initialSteps: StepStep): StepEngineBuilder {
-        return StepEngineBuilder().addSteps(*initialSteps)
+    fun <T> createStepEngineBuilder(vararg initialSteps: StepStep<T>): StepEngineBuilder<T> {
+        return StepEngineBuilder<T>().addSteps(*initialSteps)
     }
     
     /**
@@ -33,8 +34,8 @@ object StepApi {
      * @param initialSteps 初始步骤列表
      * @return Step引擎构建器实例
      */
-    fun createStepEngineBuilder(initialSteps: List<StepStep>): StepEngineBuilder {
-        return StepEngineBuilder().addSteps(initialSteps)
+    fun <T> createStepEngineBuilder(initialSteps: List<StepStep<T>>): StepEngineBuilder<T> {
+        return StepEngineBuilder<T>().addSteps(initialSteps)
     }
 }
 

@@ -4,6 +4,7 @@ package org.spark.stepstep
  * 自定义Step步骤接口
  * 
  * 参考Google StepStep设计，提供完整的步骤生命周期管理
+ * 支持协程和泛型数据传递
  * 
  * 生命周期流程：
  * 1. isAvailable() - 检查步骤是否可用
@@ -12,7 +13,7 @@ package org.spark.stepstep
  * 4. onStepStopped() - 步骤停止（进入下一步或返回上一步）
  * 5. cleanup() - 清理资源（步骤彻底结束时）
  */
-interface StepStep {
+interface StepStep<T> {
     
     /**
      * 步骤是否可用
@@ -32,7 +33,7 @@ interface StepStep {
      * 
      * @param stepCompletionProvider 步骤完成提供者，用于控制步骤流转
      */
-    fun onStepStarted(stepCompletionProvider: StepCompletionProvider)
+    suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>)
     
     /**
      * 步骤恢复
@@ -42,7 +43,7 @@ interface StepStep {
      * 
      * @param stepCompletionProvider 步骤完成提供者
      */
-    fun onStepResumed(stepCompletionProvider: StepCompletionProvider) {
+    suspend fun onStepResumed(stepCompletionProvider: StepCompletionProvider<T>) {
         // 默认空实现，子类可选择性重写
     }
     
@@ -54,7 +55,7 @@ interface StepStep {
      * 
      * 注意：这不是最终清理，步骤可能会被恢复（onStepResumed）
      */
-    fun onStepStopped() {
+    suspend fun onStepStopped() {
         // 默认空实现，子类可选择性重写
     }
     
@@ -66,7 +67,7 @@ interface StepStep {
      * 
      * 调用cleanup()后，该步骤不会再被使用
      */
-    fun cleanup() {
+    suspend fun cleanup() {
         // 默认空实现，子类可选择性重写
     }
     

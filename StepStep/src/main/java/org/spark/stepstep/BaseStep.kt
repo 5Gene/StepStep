@@ -7,8 +7,9 @@ import androidx.annotation.CallSuper
  * 
  * 提供一些通用的功能和便捷方法
  * 业务可以继承此类实现自己的Step步骤
+ * 支持协程和泛型数据传递
  */
-abstract class BaseStep : StepStep {
+abstract class BaseStep<T> : StepStep<T> {
     
     protected val TAG: String = "StepStep#${getStepId()}"
     
@@ -16,7 +17,7 @@ abstract class BaseStep : StepStep {
      * StepCompletionProvider实例
      * 在onStepStarted时初始化
      */
-    protected lateinit var stepCompletionProvider: StepCompletionProvider
+    protected lateinit var stepCompletionProvider: StepCompletionProvider<T>
     
     /**
      * 步骤是否已启动
@@ -30,8 +31,19 @@ abstract class BaseStep : StepStep {
     protected var isStepStopped: Boolean = false
         private set
     
+    /**
+     * 检查StepCompletionProvider是否已初始化
+     */
+    private fun checkProviderInitialized(): Boolean {
+        if (!::stepCompletionProvider.isInitialized) {
+            logE("StepCompletionProvider not initialized. Call onStepStarted first.")
+            return false
+        }
+        return true
+    }
+    
     @CallSuper
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
         this.stepCompletionProvider = stepCompletionProvider
         this.isStepStarted = true
         this.isStepStopped = false
@@ -39,20 +51,20 @@ abstract class BaseStep : StepStep {
     }
     
     @CallSuper
-    override fun onStepResumed(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepResumed(stepCompletionProvider: StepCompletionProvider<T>) {
         this.stepCompletionProvider = stepCompletionProvider
         this.isStepStopped = false
         logD("onStepResumed")
     }
     
     @CallSuper
-    override fun onStepStopped() {
+    override suspend fun onStepStopped() {
         this.isStepStopped = true
         logD("onStepStopped")
     }
     
     @CallSuper
-    override fun cleanup() {
+    override suspend fun cleanup() {
         logD("cleanup")
     }
     
@@ -77,24 +89,20 @@ abstract class BaseStep : StepStep {
     /**
      * 完成当前步骤
      */
-    protected fun finish() {
+    protected suspend fun finish() {
         logD("finish")
-        if (::stepCompletionProvider.isInitialized) {
+        if (checkProviderInitialized()) {
             stepCompletionProvider.finish()
-        } else {
-            logE("finish() called before onStepStarted")
         }
     }
     
     /**
      * 返回上一步
      */
-    protected fun navigateBack() {
+    protected suspend fun navigateBack() {
         logD("navigateBack")
-        if (::stepCompletionProvider.isInitialized) {
+        if (checkProviderInitialized()) {
             stepCompletionProvider.navigateBack()
-        } else {
-            logE("navigateBack() called before onStepStarted")
         }
     }
     
@@ -103,14 +111,107 @@ abstract class BaseStep : StepStep {
      * 
      * @param fromUser 是否由用户主动触发
      */
-    protected fun abortStep(fromUser: Boolean = true) {
+    protected suspend fun abortStep(fromUser: Boolean = true) {
         logD("abortStep(fromUser=$fromUser)")
-        if (::stepCompletionProvider.isInitialized) {
+        if (checkProviderInitialized()) {
             stepCompletionProvider.abortStep(fromUser)
-        } else {
-            logE("abortStep() called before onStepStarted")
         }
     }
+    
+    /**
+     * 报告错误并中止流程
+     * 
+     * @param exception 错误异常
+     */
+    protected suspend fun error(exception: Throwable) {
+        logE("error: ${exception.message}")
+        if (checkProviderInitialized()) {
+            stepCompletionProvider.error(exception)
+        }
+    }
+    
+    /**
+     * 获取泛型数据
+     */
+    protected fun getData(): T? {
+        return if (checkProviderInitialized()) {
+            stepCompletionProvider.getData()
+        } else {
+            null
+        }
+    }
+    
+    /**
+     * 设置泛型数据
+     */
+    protected fun setData(data: T?) {
+        if (checkProviderInitialized()) {
+            stepCompletionProvider.setData(data)
+        }
+    }
+    
+    /**
+     * 动态添加步骤到指定ID的步骤之后
+     */
+    protected suspend fun addStepAfter(targetStepId: String, step: StepStep<T>) {
+        if (checkProviderInitialized()) {
+            stepCompletionProvider.addStepAfter(targetStepId, step)
+        }
+    }
+    
+    /**
+     * 动态添加步骤到指定ID的步骤之前
+     */
+    protected suspend fun addStepBefore(targetStepId: String, step: StepStep<T>) {
+        if (checkProviderInitialized()) {
+            stepCompletionProvider.addStepBefore(targetStepId, step)
+        }
+    }
+    
+    /**
+     * 动态添加步骤（添加到步骤列表末尾）
+     */
+    protected suspend fun addStep(step: StepStep<T>) {
+        if (checkProviderInitialized()) {
+            stepCompletionProvider.addStep(step)
+        }
+    }
+    
+    /**
+     * 动态添加多个步骤到指定ID的步骤之后
+     */
+    protected suspend fun addStepsAfter(targetStepId: String, vararg steps: StepStep<T>) {
+        steps.forEach { addStepAfter(targetStepId, it) }
+    }
+    
+    /**
+     * 动态添加多个步骤到指定ID的步骤之前
+     */
+    protected suspend fun addStepsBefore(targetStepId: String, vararg steps: StepStep<T>) {
+        steps.forEach { addStepBefore(targetStepId, it) }
+    }
+    
+    /**
+     * 动态添加多个步骤到末尾
+     */
+    protected suspend fun addSteps(vararg steps: StepStep<T>) {
+        steps.forEach { addStep(it) }
+    }
+    
+    /**
+     * 安全地获取数据，如果获取失败返回默认值
+     */
+    protected fun getDataOrDefault(defaultValue: T): T = getData() ?: defaultValue
+    
+    /**
+     * 检查步骤是否已启动
+     */
+    protected fun isStarted(): Boolean = isStepStarted
+    
+    /**
+     * 检查步骤是否已停止
+     */
+    protected fun isStopped(): Boolean = isStepStopped
     
     /**
      * 日志方法 - Debug级别
