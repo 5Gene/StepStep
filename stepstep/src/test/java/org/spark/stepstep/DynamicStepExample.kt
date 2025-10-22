@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import kotlinx.coroutines.delay
 import org.spark.stepstep.BaseStep
@@ -62,7 +62,7 @@ class FirstStep<T> : BaseStep<T>() {
         // 动态添加中间步骤
         logI("动态添加中间步骤")
         val middleStep = MiddleStep<T>()
-        addStepAfter("FirstStep", middleStep)
+        addStep(middleStep)
         
         logI("第一个步骤完成，进入下一步")
         finish()

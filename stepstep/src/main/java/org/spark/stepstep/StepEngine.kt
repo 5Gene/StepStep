@@ -8,13 +8,24 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 
 /**
- * Step引擎
+ * Step引擎 - 核心执行引擎
  * 
- * 负责管理整个Step流程的执行
- * 维护步骤的执行顺序和状态
- * 支持协程和泛型数据传递
+ * 负责管理整个Step流程的执行，是整个框架的核心组件
+ * 维护步骤的执行顺序和状态，支持协程和泛型数据传递
+ * 
+ * 设计理念：
+ * 1. 线程安全：使用Mutex确保多线程环境下的安全性
+ * 2. 状态管理：通过StateFlow提供响应式的状态变化通知
+ * 3. 生命周期：完整管理步骤的生命周期（开始、恢复、停止、清理）
+ * 4. 数据传递：支持泛型数据和键值对数据两种传递方式
+ * 5. 动态管理：支持运行时动态添加、移除步骤
+ * 
+ * 为什么使用internal constructor？
+ * 防止外部直接创建StepEngine，必须通过StepEngineBuilder构建，
+ * 确保步骤顺序的正确性和DAG验证的完整性
  */
 class StepEngine<T> internal constructor(
     private val steps: MutableList<StepStep<T>>
@@ -25,28 +36,36 @@ class StepEngine<T> internal constructor(
     }
     
     // 当前步骤索引，-1表示未开始
+    // 为什么使用-1？因为0是第一个步骤的索引，-1表示未开始状态
     private var currentStepIndex: Int = -1
     
-    // 执行历史栈，用于navigateBack
+    // 执行历史栈，用于navigateBack功能
+    // 为什么需要历史栈？因为用户可能多次前进后退，需要记录完整的执行路径
     private val executionStack = mutableListOf<Int>()
     
-    // 步骤变化的数据流
+    // 步骤变化的数据流，使用StateFlow提供响应式状态
+    // 为什么使用StateFlow而不是Flow？StateFlow有初始值，更适合状态管理
     private val _stepChangeFlow = MutableStateFlow<StepChange<T>?>(null)
     
-    // 数据传递容器
+    // 键值对数据容器，用于存储任意类型的数据
+    // 为什么需要这个？除了泛型数据，还需要存储配置、状态等额外信息
     private val dataContainer = mutableMapOf<String, Any?>()
     
-    // 泛型数据
+    // 泛型数据，类型安全的数据传递
+    // 为什么需要泛型？提供类型安全，避免类型转换错误
     private var genericData: T? = null
     
     // 协程互斥锁，确保线程安全
+    // 为什么需要Mutex？动态添加步骤和状态变更可能并发执行，需要同步
     private val mutex = Mutex()
     
-    // 流程结果回调
+    // 流程结果回调，链式调用设计
+    // 为什么使用链式调用？提供更好的API体验，符合现代Kotlin风格
     private var onSuccess: ((T?) -> Unit)? = null
     private var onError: ((Throwable) -> Unit)? = null
     
-    // 流程完成信号
+    // 流程完成信号，用于等待流程完成
+    // 为什么使用CompletableDeferred？提供协程友好的等待机制
     private var completionDeferred: CompletableDeferred<T?>? = null
     
     /**

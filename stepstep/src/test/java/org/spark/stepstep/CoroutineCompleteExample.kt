@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -233,14 +233,14 @@ object CoroutineCompleteExample {
         
         // 启动流程
         try {
-            val result = engine.start(
-                onSuccess = { data ->
+            engine
+                .onSuccess { data ->
                     println("✅ 流程成功完成: $data")
-                },
-                onError = { error ->
+                }
+                .onError { error ->
                     println("❌ 流程失败: ${error.message}")
                 }
-            )
+                .start("初始数据")
         } catch (e: Exception) {
             println("❌ 流程异常: ${e.message}")
         }
@@ -275,10 +275,10 @@ object CoroutineCompleteExample {
  * 示例步骤实现
  */
 
-class WelcomeStep<T> : BaseStep<T>() {
+class WelcomeStep : BaseStep<String>() {
     override fun getStepId(): String = "WelcomeStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("显示欢迎页面")
         delay(1000)
@@ -286,12 +286,12 @@ class WelcomeStep<T> : BaseStep<T>() {
     }
 }
 
-class PermissionStep<T>(
+class PermissionStep(
     private val permissions: List<String>
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     override fun getStepId(): String = "PermissionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("申请权限: ${permissions.joinToString()}")
         delay(1500)
@@ -299,10 +299,10 @@ class PermissionStep<T>(
     }
 }
 
-class DeviceDiscoveryStep<T> : BaseStep<T>() {
+class DeviceDiscoveryStep : BaseStep<String>() {
     override fun getStepId(): String = "DeviceDiscoveryStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("搜索设备")
         delay(2000)
@@ -310,12 +310,12 @@ class DeviceDiscoveryStep<T> : BaseStep<T>() {
     }
 }
 
-class DeviceConnectionStep<T>(
+class DeviceConnectionStep(
     private val deviceMac: String
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     override fun getStepId(): String = "DeviceConnectionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("连接设备: $deviceMac")
         delay(3000)
@@ -323,10 +323,10 @@ class DeviceConnectionStep<T>(
     }
 }
 
-class DataSyncStep<T> : BaseStep<T>() {
+class DataSyncStep : BaseStep<String>() {
     override fun getStepId(): String = "DataSyncStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("同步数据")
         delay(2500)
@@ -334,10 +334,10 @@ class DataSyncStep<T> : BaseStep<T>() {
     }
 }
 
-class CompleteStep<T> : BaseStep<T>() {
+class CompleteStep : BaseStep<String>() {
     override fun getStepId(): String = "CompleteStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("显示完成页面")
         delay(1000)
@@ -345,10 +345,10 @@ class CompleteStep<T> : BaseStep<T>() {
     }
 }
 
-class DataLoadStep<T> : BaseStep<T>() {
+class DataLoadStep : BaseStep<String>() {
     override fun getStepId(): String = "DataLoadStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("加载数据")
         delay(1000)
@@ -356,10 +356,10 @@ class DataLoadStep<T> : BaseStep<T>() {
     }
 }
 
-class ErrorHandlingStep<T> : BaseStep<T>() {
+class ErrorHandlingStep : BaseStep<String>() {
     override fun getStepId(): String = "ErrorHandlingStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行可能出错的操作")
         
@@ -376,10 +376,10 @@ class ErrorHandlingStep<T> : BaseStep<T>() {
     }
 }
 
-class TimeoutStep<T> : BaseStep<T>() {
+class TimeoutStep : BaseStep<String>() {
     override fun getStepId(): String = "TimeoutStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("执行可能超时的操作")
         
@@ -394,13 +394,13 @@ class TimeoutStep<T> : BaseStep<T>() {
     }
 }
 
-class DataStep<T>(
+class DataStep(
     private val stepName: String,
     private val data: String
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     override fun getStepId(): String = "DataStep_$stepName"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("处理数据: $data")
         delay(500)
@@ -408,9 +408,9 @@ class DataStep<T>(
     }
 }
 
-class ConditionalStep<T>(
+class ConditionalStep(
     private val condition: suspend () -> Boolean
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     override fun getStepId(): String = "ConditionalStep"
     
     override suspend fun isAvailable(): Boolean {
@@ -419,7 +419,7 @@ class ConditionalStep<T>(
         return available
     }
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         logI("条件步骤执行")
         delay(300)

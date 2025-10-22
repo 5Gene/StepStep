@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import org.spark.stepstep.BaseStep
 import org.spark.stepstep.StepApi

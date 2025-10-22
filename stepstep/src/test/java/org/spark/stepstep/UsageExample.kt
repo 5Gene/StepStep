@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -184,33 +184,40 @@ object UsageExample {
             .addStep(CompleteStepStep())
         
         // 模块A：添加权限步骤
-        builder.addStepAfter<WelcomeStepStep>(
+        builder.addStepAfter(
+            "WelcomeStepStep",
             PermissionStepStep(listOf("android.permission.BLUETOOTH"))
         )
         
         // 模块B：想在WelcomeStepStep后添加另一个步骤
         // 这会抛出异常，因为不允许多个步骤插入同一位置
         try {
-            builder.addStepAfter<WelcomeStepStep>(
+            builder.addStepAfter(
+                "WelcomeStepStep",
                 ConfigSyncStepStep()
             )
         } catch (e: IllegalArgumentException) {
             println("检测到插入冲突: ${e.message}")
             
             // 解决方案1：插入到不同的位置
-            builder.addStepAfter<PermissionStepStep>(
+            builder.addStepAfter(
+                "PermissionStepStep",
                 ConfigSyncStepStep()
             )
             
             // 解决方案2：允许冲突（不推荐）
-            // builder.addStepAfter<WelcomeStepStep>(
+            // builder.addStepAfter(
+            //     "WelcomeStepStep",
             //     ConfigSyncStepStep(),
             //     allowConflict = true
             // )
         }
         
         val engine = builder.build()
-        engine.start()
+        engine
+            .onSuccess { data -> println("流程成功: $data") }
+            .onError { error -> println("流程失败: ${error.message}") }
+            .start("初始数据")
     }
     
     /**

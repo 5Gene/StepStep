@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -138,7 +138,7 @@ object CompleteUsageExample {
 class WelcomeStep<T> : BaseStep<T>() {
     override fun getStepId(): String = "WelcomeStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("显示欢迎页面")
@@ -158,10 +158,10 @@ class WelcomeStep<T> : BaseStep<T>() {
     }
 }
 
-class DataProcessStep<T> : BaseStep<T>() {
+class DataProcessStep : BaseStep<String>() {
     override fun getStepId(): String = "DataProcessStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("处理数据")
@@ -179,10 +179,10 @@ class DataProcessStep<T> : BaseStep<T>() {
     }
 }
 
-class CompleteStep<T> : BaseStep<T>() {
+class CompleteStep : BaseStep<String>() {
     override fun getStepId(): String = "CompleteStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("显示完成页面")
@@ -196,10 +196,10 @@ class CompleteStep<T> : BaseStep<T>() {
     }
 }
 
-class DataStep1<T> : BaseStep<T>() {
+class DataStep1 : BaseStep<String>() {
     override fun getStepId(): String = "DataStep1"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("数据步骤1")
@@ -211,10 +211,10 @@ class DataStep1<T> : BaseStep<T>() {
     }
 }
 
-class DataStep2<T> : BaseStep<T>() {
+class DataStep2 : BaseStep<String>() {
     override fun getStepId(): String = "DataStep2"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("数据步骤2")
@@ -226,10 +226,10 @@ class DataStep2<T> : BaseStep<T>() {
     }
 }
 
-class DataStep3<T> : BaseStep<T>() {
+class DataStep3 : BaseStep<String>() {
     override fun getStepId(): String = "DataStep3"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("数据步骤3")

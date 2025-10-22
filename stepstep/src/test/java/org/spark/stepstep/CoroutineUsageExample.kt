@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -84,11 +84,11 @@ object CoroutineUsageExample {
             .build()
         
         try {
-            engine.start(
-                onSuccess = { data ->
+            engine
+                .onSuccess { data ->
                     println("流程成功: $data")
-                },
-                onError = { error ->
+                }
+                .onError { error ->
                     println("流程失败: ${error.message}")
                     when (error) {
                         is IOException -> println("网络错误")
@@ -96,7 +96,7 @@ object CoroutineUsageExample {
                         else -> println("其他错误: ${error.javaClass.simpleName}")
                     }
                 }
-            )
+                .start("初始数据")
         } catch (e: Exception) {
             println("捕获异常: ${e.message}")
         }

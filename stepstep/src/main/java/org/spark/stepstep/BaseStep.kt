@@ -3,36 +3,64 @@ package org.spark.stepstep
 import androidx.annotation.CallSuper
 
 /**
- * Step步骤的基类
+ * Step步骤的基类 - 提供便捷的步骤实现
  * 
- * 提供一些通用的功能和便捷方法
- * 业务可以继承此类实现自己的Step步骤
- * 支持协程和泛型数据传递
+ * 为什么需要BaseStep？
+ * 1. 减少样板代码：提供通用的生命周期管理
+ * 2. 统一日志：内置日志功能，便于调试
+ * 3. 状态管理：自动管理步骤的启动/停止状态
+ * 4. 便捷方法：提供常用的数据操作和流程控制方法
+ * 5. 错误处理：统一的错误处理机制
+ * 
+ * 设计原则：
+ * 1. 模板方法模式：定义步骤的生命周期模板
+ * 2. 开闭原则：对扩展开放，对修改封闭
+ * 3. 单一职责：每个方法只负责一个功能
+ * 4. 协程友好：所有方法都支持协程
  */
 abstract class BaseStep<T> : StepStep<T> {
     
+    // 日志标签，包含步骤ID便于调试
+    // 为什么需要TAG？Android日志系统需要标签来过滤和分类日志
     protected val TAG: String = "StepStep#${getStepId()}"
     
     /**
      * StepCompletionProvider实例
      * 在onStepStarted时初始化
+     * 
+     * 为什么使用lateinit？
+     * 因为只有在onStepStarted时才能获得provider实例，
+     * 使用lateinit避免空值传递，提供更好的类型安全
      */
     protected lateinit var stepCompletionProvider: StepCompletionProvider<T>
     
     /**
      * 步骤是否已启动
+     * 
+     * 为什么需要这个状态？
+     * 1. 防止重复调用onStepStarted
+     * 2. 提供状态查询功能
+     * 3. 便于调试和状态检查
      */
     protected var isStepStarted: Boolean = false
         private set
     
     /**
      * 步骤是否已停止
+     * 
+     * 为什么需要这个状态？
+     * 1. 区分onStepStopped和cleanup的调用时机
+     * 2. 防止在停止状态下执行某些操作
+     * 3. 提供状态查询功能
      */
     protected var isStepStopped: Boolean = false
         private set
     
     /**
      * 检查StepCompletionProvider是否已初始化
+     * 
+     * 为什么需要这个检查？
+     * 防止在provider未初始化时调用相关方法，避免运行时异常
      */
     private fun checkProviderInitialized(): Boolean {
         if (!::stepCompletionProvider.isInitialized) {
@@ -65,7 +93,8 @@ abstract class BaseStep<T> : StepStep<T> {
     
     @CallSuper
     override suspend fun cleanup() {
-        logD("cleanup")
+        isStepStopped = true
+        logD("Step cleanup completed")
     }
     
     /**

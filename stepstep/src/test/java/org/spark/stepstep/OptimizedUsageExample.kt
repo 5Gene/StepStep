@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import org.spark.stepstep.BaseStep
 import org.spark.stepstep.StepApi
@@ -56,7 +56,7 @@ class WelcomeStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "WelcomeStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("欢迎步骤开始")
@@ -84,7 +84,7 @@ class PermissionStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "PermissionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("权限步骤开始")
@@ -106,7 +106,7 @@ class ValidationStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "ValidationStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("验证步骤开始")
@@ -124,11 +124,11 @@ class ValidationStep<T> : BaseStep<T>() {
 /**
  * 便捷方法演示步骤
  */
-class ConvenienceStep<T> : BaseStep<T>() {
+class ConvenienceStep : BaseStep<String>() {
     
     override fun getStepId(): String = "ConvenienceStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("便捷方法演示步骤开始")
@@ -142,9 +142,9 @@ class ConvenienceStep<T> : BaseStep<T>() {
         
         // 演示批量添加步骤
         val additionalSteps = arrayOf(
-            AdditionalStep1<T>(),
-            AdditionalStep2<T>(),
-            AdditionalStep3<T>()
+            AdditionalStep1(),
+            AdditionalStep2(),
+            AdditionalStep3()
         )
         
         addSteps(*additionalSteps)
@@ -160,11 +160,11 @@ class ConvenienceStep<T> : BaseStep<T>() {
 /**
  * 额外步骤1
  */
-class AdditionalStep1<T> : BaseStep<T>() {
+class AdditionalStep1 : BaseStep<String>() {
     
     override fun getStepId(): String = "AdditionalStep1"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("额外步骤1开始")
@@ -177,11 +177,11 @@ class AdditionalStep1<T> : BaseStep<T>() {
 /**
  * 额外步骤2
  */
-class AdditionalStep2<T> : BaseStep<T>() {
+class AdditionalStep2 : BaseStep<String>() {
     
     override fun getStepId(): String = "AdditionalStep2"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("额外步骤2开始")
@@ -194,11 +194,11 @@ class AdditionalStep2<T> : BaseStep<T>() {
 /**
  * 额外步骤3
  */
-class AdditionalStep3<T> : BaseStep<T>() {
+class AdditionalStep3 : BaseStep<String>() {
     
     override fun getStepId(): String = "AdditionalStep3"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("额外步骤3开始")
@@ -215,7 +215,7 @@ class CompleteStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "CompleteStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<T>) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("完成步骤开始")

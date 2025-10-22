@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import kotlinx.coroutines.delay
 import org.spark.stepstep.BaseStep
@@ -15,11 +15,11 @@ import java.io.IOException
 /**
  * 示例步骤1：异步数据加载
  */
-class AsyncDataLoadStep<T> : BaseStep<T>() {
+class AsyncDataLoadStep : BaseStep<String>() {
     
     override fun getStepId(): String = "AsyncDataLoadStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始异步加载数据")
@@ -47,15 +47,15 @@ class AsyncDataLoadStep<T> : BaseStep<T>() {
 /**
  * 示例步骤2：权限请求（协程版本）
  */
-class CoroutinePermissionStep<T>(
+class CoroutinePermissionStep(
     private val permissions: List<String>
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     
     private var isPermissionGranted = false
     
     override fun getStepId(): String = "CoroutinePermissionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("申请权限: ${permissions.joinToString()}")
@@ -101,7 +101,7 @@ class CoroutineDeviceConnectionStep<T>(
     
     override fun getStepId(): String = "CoroutineDeviceConnectionStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始连接设备: $deviceMac")
@@ -164,11 +164,11 @@ class CoroutineDeviceConnectionStep<T>(
 /**
  * 示例步骤4：数据同步（协程版本）
  */
-class CoroutineDataSyncStep<T> : BaseStep<T>() {
+class CoroutineDataSyncStep : BaseStep<String>() {
     
     override fun getStepId(): String = "CoroutineDataSyncStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始同步数据")
@@ -193,11 +193,11 @@ class CoroutineDataSyncStep<T> : BaseStep<T>() {
 /**
  * 示例步骤5：完成页面（协程版本）
  */
-class CoroutineCompleteStep<T> : BaseStep<T>() {
+class CoroutineCompleteStep : BaseStep<String>() {
     
     override fun getStepId(): String = "CoroutineCompleteStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("显示完成页面")
@@ -213,9 +213,9 @@ class CoroutineCompleteStep<T> : BaseStep<T>() {
 /**
  * 示例步骤6：条件步骤（协程版本）
  */
-class CoroutineConditionalStep<T>(
+class CoroutineConditionalStep(
     private val condition: suspend () -> Boolean
-) : BaseStep<T>() {
+) : BaseStep<String>() {
     
     override fun getStepId(): String = "CoroutineConditionalStep"
     
@@ -225,7 +225,7 @@ class CoroutineConditionalStep<T>(
         return available
     }
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("条件步骤执行")
@@ -244,7 +244,7 @@ class ErrorHandlingStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "ErrorHandlingStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始错误处理步骤")
@@ -281,7 +281,7 @@ class DynamicStepManagementStep<T> : BaseStep<T>() {
     
     override fun getStepId(): String = "DynamicStepManagementStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始动态步骤管理")
@@ -312,14 +312,14 @@ class DynamicStepManagementStep<T> : BaseStep<T>() {
 /**
  * 示例步骤9：数据传递步骤
  */
-class DataPassingStep<T>(
+class DataPassingStep(
     private val dataKey: String,
-    private val dataValue: T
-) : BaseStep<T>() {
+    private val dataValue: String
+) : BaseStep<String>() {
     
     override fun getStepId(): String = "DataPassingStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始数据传递步骤")
@@ -339,7 +339,7 @@ class DataPassingStep<T>(
         }
     }
     
-    private suspend fun processData(data: T): T {
+    private suspend fun processData(data: String): String {
         delay(800)
         return data
     }
@@ -348,11 +348,11 @@ class DataPassingStep<T>(
 /**
  * 示例步骤10：超时处理步骤
  */
-class TimeoutHandlingStep<T> : BaseStep<T>() {
+class TimeoutHandlingStep : BaseStep<String>() {
     
     override fun getStepId(): String = "TimeoutHandlingStep"
     
-    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始超时处理步骤")

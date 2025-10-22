@@ -26,4 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "StepStep"
 include(":app")
-include(":StepStep")
+include(":stepstep")

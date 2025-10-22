@@ -10,4 +10,6 @@ android {
 
 dependencies {
     implementation(vcl.google.material)
+    implementation(vcl.kotlinx.coroutines.android)
+    implementation(vcl.androidx.annotation)
 }

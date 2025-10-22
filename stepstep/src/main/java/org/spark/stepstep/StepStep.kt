@@ -77,6 +77,6 @@ interface StepStep<T> {
      * 用于识别步骤，调试日志等
      * 默认返回类名
      */
-    fun getStepId(): String = this::class.java.simpleName
+    fun getStepId(): String = this::class.simpleName!!
 }
 

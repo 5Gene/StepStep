@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import android.content.Context
 import androidx.lifecycle.LiveData

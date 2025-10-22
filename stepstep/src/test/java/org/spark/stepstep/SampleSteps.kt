@@ -1,4 +1,4 @@
-package org.spark.stepstep.samples
+package org.spark.stepstep
 
 import org.spark.stepstep.BaseStep
 import org.spark.stepstep.StepCompletionProvider
@@ -12,11 +12,11 @@ import org.spark.stepstep.StepCompletionProvider
 /**
  * 示例步骤1：欢迎页面
  */
-class WelcomeStepStep : BaseStep() {
+class WelcomeStepStep : BaseStep<String>() {
     
     override fun getStepId(): String = "WelcomeStep"
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         // 这里可以启动Activity、显示Dialog等
@@ -27,7 +27,7 @@ class WelcomeStepStep : BaseStep() {
         // finish()
     }
     
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         // 可以根据条件决定是否显示此步骤
         return true
     }
@@ -38,13 +38,13 @@ class WelcomeStepStep : BaseStep() {
  */
 class PermissionStepStep(
     private val permissions: List<String>
-) : BaseStep() {
+) : BaseStep<String>() {
     
     private var isPermissionGranted = false
     
     override fun getStepId(): String = "PermissionStep"
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("申请权限: ${permissions.joinToString()}")
@@ -76,7 +76,7 @@ class PermissionStepStep(
         }
     }
     
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         // 如果权限已经授予，可以跳过此步骤
         return !isPermissionGranted
     }
@@ -87,13 +87,13 @@ class PermissionStepStep(
  */
 class DeviceConnectionStepStep(
     private val deviceMac: String
-) : BaseStep() {
+) : BaseStep<String>() {
     
     private var isConnecting = false
     
     override fun getStepId(): String = "DeviceConnectionStep"
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始连接设备: $deviceMac")
@@ -128,7 +128,7 @@ class DeviceConnectionStepStep(
         }
     }
     
-    override fun onStepStopped() {
+    override suspend fun onStepStopped() {
         super.onStepStopped()
         // 如果正在连接，可能需要取消连接操作
         if (isConnecting) {
@@ -137,7 +137,7 @@ class DeviceConnectionStepStep(
         }
     }
     
-    override fun cleanup() {
+    override suspend fun cleanup() {
         super.cleanup()
         // 清理连接资源
         logI("清理连接资源")
@@ -147,11 +147,11 @@ class DeviceConnectionStepStep(
 /**
  * 示例步骤4：配置同步
  */
-class ConfigSyncStepStep : BaseStep() {
+class ConfigSyncStepStep : BaseStep<String>() {
     
     override fun getStepId(): String = "ConfigSyncStep"
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("开始同步配置")
@@ -164,7 +164,7 @@ class ConfigSyncStepStep : BaseStep() {
         finish()
     }
     
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         // 只在首次设置时需要同步配置
         return true
     }
@@ -173,11 +173,11 @@ class ConfigSyncStepStep : BaseStep() {
 /**
  * 示例步骤5：完成页面
  */
-class CompleteStepStep : BaseStep() {
+class CompleteStepStep : BaseStep<String>() {
     
     override fun getStepId(): String = "CompleteStep"
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("显示完成页面")
@@ -194,20 +194,20 @@ class CompleteStepStep : BaseStep() {
  */
 class ConditionalStepStep(
     private val condition: () -> Boolean
-) : BaseStep() {
+) : BaseStep<String>() {
     
     override fun getStepId(): String = "ConditionalStep"
     
     /**
      * 重写 isAvailable() 使用传入的条件函数
      */
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         val available = condition()
         logI("isAvailable: $available")
         return available
     }
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("条件步骤执行")
@@ -222,19 +222,19 @@ class ConditionalStepStep(
  */
 class FirstTimeStepStep(
     private val isFirstTime: Boolean
-) : BaseStep() {
+) : BaseStep<String>() {
     
     override fun getStepId(): String = "FirstTimeStepStep"
     
     /**
      * 只在首次设置时可用
      */
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         logI("isAvailable: isFirstTime=$isFirstTime")
         return isFirstTime
     }
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("显示首次设置引导")
@@ -250,21 +250,21 @@ class FirstTimeStepStep(
  */
 class ApiLevelDependentStep(
     private val minApiLevel: Int
-) : BaseStep() {
+) : BaseStep<String>() {
     
     override fun getStepId(): String = "ApiLevelDependentStep"
     
     /**
      * 检查系统版本是否满足要求
      */
-    override fun isAvailable(): Boolean {
+    override suspend fun isAvailable(): Boolean {
         val currentApiLevel = android.os.Build.VERSION.SDK_INT
         val available = currentApiLevel >= minApiLevel
         logI("isAvailable: currentApiLevel=$currentApiLevel, minApiLevel=$minApiLevel, available=$available")
         return available
     }
     
-    override fun onStepStarted(stepCompletionProvider: StepCompletionProvider) {
+    override suspend fun onStepStarted(stepCompletionProvider: StepCompletionProvider<String>) {
         super.onStepStarted(stepCompletionProvider)
         
         logI("执行需要API $minApiLevel 的功能")
