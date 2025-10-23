@@ -3,6 +3,10 @@ package org.spark.stepstep
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okio.Sink
 import org.spark.stepstep.StepApi
 import org.spark.stepstep.StepChange
@@ -16,17 +20,17 @@ import org.spark.stepstep.toLiveData
  * 演示如何在实际项目中使用Step框架
  * 类似于Google Step SDK的使用方式
  */
-class StepNavigator private constructor(private val context: Context) {
+class StepNavigator private constructor() {
     
     companion object {
         private const val TAG = "StepNavigator"
         private var instance: StepNavigator? = null
         
         @JvmStatic
-        fun getInstance(context: Context): StepNavigator {
+        fun getInstance(): StepNavigator {
             var ins = instance
             if (ins == null) {
-                ins = StepNavigator(context.applicationContext)
+                ins = StepNavigator()
                 instance = ins
             }
             return ins
@@ -50,14 +54,11 @@ class StepNavigator private constructor(private val context: Context) {
     /**
      * 开始Step流程
      * 
-     * @param deviceMac 设备MAC地址
-     * @param deviceModel 设备型号
      * @param skipWelcome 是否跳过欢迎页面
      * @param result 结果回调
      */
     suspend fun startStep(
-        deviceMac: String,
-        deviceModel: String,
+        data: String,
         skipWelcome: Boolean = false,
         result: ((Boolean, String?) -> Unit)? = null
     ) {
@@ -87,7 +88,7 @@ class StepNavigator private constructor(private val context: Context) {
                 ))
                 
                 // 设备连接步骤
-                addStep(DeviceConnectionStepStep(deviceMac))
+                addStep(DeviceConnectionStepStep(data))
                 
                 // 配置同步步骤
                 addStep(ConfigSyncStepStep())
@@ -98,11 +99,25 @@ class StepNavigator private constructor(private val context: Context) {
             .build()
         
         // 监听步骤变化
-        currentStepLiveData = StepEngine.getStepChangeFlow().toLiveData()
-        currentStepLiveData.observeForever(StepStepChangeObserver)
+        GlobalScope.launch {
+            StepEngine.getStepChangeFlow().collect {
+                // 步骤变化
+                println("[$TAG] Step: ${it?.currentStep?.getStepId()}, " +
+                        "Type: ${it?.changeType}, " +
+                        "Progress: ${it?.currentIndex?:0 + 1}/${it?.totalSteps}")
+            }
+        }
+//        currentStepLiveData = StepEngine.getStepChangeFlow().toLiveData()
+//        currentStepLiveData.observeForever(StepStepChangeObserver)
         
         // 启动Step流程
-        StepEngine.start()
+        StepEngine
+            .onStepChange {
+                println("[$TAG] xxxx Step: ${it?.currentStep?.getStepId()}, " +
+                        "Type: ${it?.changeType}, " +
+                        "Progress: ${it?.currentIndex?:0 + 1}/${it?.totalSteps}")
+            }
+            .start(data)
     }
     
     /**

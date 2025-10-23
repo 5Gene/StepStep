@@ -34,6 +34,10 @@ class StepEngine<T> internal constructor(
     companion object {
         private const val TAG = "StepEngine"
     }
+
+    init {
+        println("steps 顺序：${steps.joinToString { it.getStepId() }}")
+    }
     
     // 当前步骤索引，-1表示未开始
     // 为什么使用-1？因为0是第一个步骤的索引，-1表示未开始状态
@@ -46,6 +50,9 @@ class StepEngine<T> internal constructor(
     // 步骤变化的数据流，使用StateFlow提供响应式状态
     // 为什么使用StateFlow而不是Flow？StateFlow有初始值，更适合状态管理
     private val _stepChangeFlow = MutableStateFlow<StepChange<T>?>(null)
+    private var stepChangeListener:(StepChange<T>)-> Unit = { change ->
+        _stepChangeFlow.value = change
+    }
     
     // 键值对数据容器，用于存储任意类型的数据
     // 为什么需要这个？除了泛型数据，还需要存储配置、状态等额外信息
@@ -152,13 +159,21 @@ class StepEngine<T> internal constructor(
         this.onError = callback
         return this
     }
+
+    /**
+     * 设置错误回调
+     */
+    fun onStepChange(callback: (StepChange<T>) -> Unit): StepEngine<T> {
+        this.stepChangeListener = callback
+        return this
+    }
     
     /**
      * 启动Step流程（协程版本）
      * 
      * @param initialData 初始数据
      */
-    suspend fun start(initialData: T? = null) = withContext(Dispatchers.Main) {
+    suspend fun start(initialData: T? = null) {
         // 设置初始数据
         if (initialData != null) {
             setGenericData(initialData)
@@ -171,7 +186,7 @@ class StepEngine<T> internal constructor(
         if (steps.isEmpty()) {
             // 没有步骤，直接完成
             notifyCompleted()
-            return@withContext
+            return
         }
         
         try {
@@ -201,9 +216,10 @@ class StepEngine<T> internal constructor(
      * 清理所有步骤
      */
     private suspend fun cleanupAllSteps() {
-        steps.forEach { 
+        steps.forEach {
             it.cleanup()
         }
+        steps.clear()
     }
     
     /**
@@ -212,21 +228,21 @@ class StepEngine<T> internal constructor(
      * @param fromUser 是否由用户主动触发
      */
     suspend fun abort(fromUser: Boolean = true) {
-        cleanupAllSteps()
-        
         val previousStep = getCurrentStep()
+        cleanupAllSteps()
         currentStepIndex = -1
         executionStack.clear()
-        
         // 通知流程已中止
-        _stepChangeFlow.value = StepChange(
+        val stepChange = StepChange(
             currentStep = null,
             previousStep = previousStep,
             currentIndex = -1,
             totalSteps = steps.size,
             changeType = StepChange.ChangeType.ABORTED
         )
-        
+        stepChangeListener(stepChange)
+        _stepChangeFlow.value = stepChange
+
         // 完成等待
         completionDeferred?.complete(null)
     }
@@ -274,18 +290,20 @@ class StepEngine<T> internal constructor(
         
         val oldStep = getCurrentStep()
         currentStepIndex = previousIndex
-        
-        // 恢复上一个步骤
-        previousStep.onStepResumed(StepCompletionProviderImpl())
-        
+
         // 通知步骤变化
-        _stepChangeFlow.value = StepChange(
+        val stepChange = StepChange(
             currentStep = previousStep,
             previousStep = oldStep,
             currentIndex = currentStepIndex,
             totalSteps = steps.size,
             changeType = StepChange.ChangeType.BACKWARD
         )
+        stepChangeListener(stepChange)
+        _stepChangeFlow.value = stepChange
+        // 恢复上一个步骤
+        previousStep.onStepResumed(StepCompletionProviderImpl())
+
     }
     
     /**
@@ -323,18 +341,19 @@ class StepEngine<T> internal constructor(
         changeType: StepChange.ChangeType
     ) {
         currentStepIndex = index
-        
-        // 启动步骤
-        step.onStepStarted(StepCompletionProviderImpl())
-        
         // 通知步骤变化
-        _stepChangeFlow.value = StepChange(
+        val stepChange = StepChange(
             currentStep = step,
             previousStep = previousStep,
             currentIndex = currentStepIndex,
             totalSteps = steps.size,
             changeType = changeType
         )
+        stepChangeListener(stepChange)
+        _stepChangeFlow.value = stepChange
+        // 启动步骤
+        step.onStepStarted(StepCompletionProviderImpl())
+
     }
     
     /**
@@ -349,13 +368,15 @@ class StepEngine<T> internal constructor(
         executionStack.clear()
         
         // 通知流程已完成
-        _stepChangeFlow.value = StepChange(
+        val stepChange = StepChange(
             currentStep = null,
             previousStep = previousStep,
             currentIndex = -1,
             totalSteps = steps.size,
             changeType = StepChange.ChangeType.COMPLETED
         )
+        stepChangeListener(stepChange)
+        _stepChangeFlow.value = stepChange
         
         // 调用成功回调
         onSuccess?.invoke(null)
@@ -399,6 +420,7 @@ class StepEngine<T> internal constructor(
                     // 如果找不到目标步骤，添加到末尾
                     steps.add(step)
                 }
+                println("steps 顺序：${steps.joinToString { it.getStepId() }}")
             }
         }
         
@@ -411,12 +433,14 @@ class StepEngine<T> internal constructor(
                     // 如果找不到目标步骤，添加到开头
                     steps.add(0, step)
                 }
+                println("steps 顺序：${steps.joinToString { it.getStepId() }}")
             }
         }
         
         override suspend fun addStep(step: StepStep<T>) {
             mutex.withLock {
                 steps.add(step)
+                println("steps 顺序：${steps.joinToString { it.getStepId() }}")
             }
         }
     }

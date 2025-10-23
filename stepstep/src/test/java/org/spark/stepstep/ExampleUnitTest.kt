@@ -1,5 +1,9 @@
 package org.spark.stepstep
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,5 +16,13 @@ class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
+        runBlocking {
+            coroutineScope {
+
+            }
+//            AdvancedDynamicStepExample.demonstrateAdvancedDynamicSteps()
+//            CompleteUsageExample.basicUsageExample()
+            StepNavigator.getInstance().startStep("")
+        }
     }
 }
