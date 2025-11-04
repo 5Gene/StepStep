@@ -6,8 +6,15 @@ plugins {
 
 android {
     namespace = "com.spark.stepstep"
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
     implementation(vcl.google.material)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(project(":stepstep"))
 }
