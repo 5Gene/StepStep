@@ -138,12 +138,13 @@ abstract class BaseStep<T> : StepStep<T> {
     /**
      * 中止Step流程
      * 
+     * @param reason 中止原因
      * @param fromUser 是否由用户主动触发
      */
-    protected suspend fun abortStep(fromUser: Boolean = true) {
-        logD("abortStep(fromUser=$fromUser)")
+    protected suspend fun abortStep(reason: String = "", fromUser: Boolean = true) {
+        logD("abortStep(reason=$reason, fromUser=$fromUser)")
         if (checkProviderInitialized()) {
-            stepCompletionProvider.abortStep(fromUser)
+            stepCompletionProvider.abortStep(reason, fromUser)
         }
     }
     

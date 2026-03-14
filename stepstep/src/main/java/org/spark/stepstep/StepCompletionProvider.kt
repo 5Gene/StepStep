@@ -31,15 +31,16 @@ interface StepCompletionProvider<T> {
     
     /**
      * 中止整个Step流程
-     * 
+     *
      * 调用后会：
      * 1. 触发所有步骤的cleanup()
      * 2. 结束整个Step流程
      * 3. 通知监听者流程已中止
-     * 
+     *
+     * @param reason 中止原因
      * @param fromUser 是否由用户主动触发（true-用户取消，false-系统错误）
      */
-    suspend fun abortStep(fromUser: Boolean = true)
+    suspend fun abortStep(reason: String, fromUser: Boolean = true)
     
     /**
      * 报告错误并中止流程

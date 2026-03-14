@@ -1,14 +1,11 @@
 package org.spark.stepstep
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
 
 /**
  * Step引擎 - 核心执行引擎
@@ -70,6 +67,7 @@ class StepEngine<T> internal constructor(
     // 为什么使用链式调用？提供更好的API体验，符合现代Kotlin风格
     private var onSuccess: ((T?) -> Unit)? = null
     private var onError: ((Throwable) -> Unit)? = null
+    private var onAbort: ((String, Boolean) -> Unit)? = null
     
     // 流程完成信号，用于等待流程完成
     // 为什么使用CompletableDeferred？提供协程友好的等待机制
@@ -167,6 +165,14 @@ class StepEngine<T> internal constructor(
         this.stepChangeListener = callback
         return this
     }
+
+    /**
+     * 设置中止回调
+     */
+    fun onAbort(callback: (reason: String, fromUser: Boolean) -> Unit): StepEngine<T> {
+        this.onAbort = callback
+        return this
+    }
     
     /**
      * 启动Step流程（协程版本）
@@ -209,7 +215,7 @@ class StepEngine<T> internal constructor(
      */
     private suspend fun handleError(throwable: Throwable) {
         onError?.invoke(throwable)
-        abort(fromUser = false)
+        doAbort(reason = "Error: ${throwable.message}", fromUser = false, triggerAbortCallback = false)
     }
     
     /**
@@ -225,23 +231,25 @@ class StepEngine<T> internal constructor(
     /**
      * 中止Step流程
      * 
+     * @param reason 中止原因
      * @param fromUser 是否由用户主动触发
      */
-    suspend fun abort(fromUser: Boolean = true) {
+    suspend fun abort(reason: String, fromUser: Boolean = true) {
+        doAbort(reason, fromUser, triggerAbortCallback = true)
+    }
+
+    /**
+     * 内部中止流程（不触发onAbort回调，用于异常处理）
+     */
+    private suspend fun doAbort(reason: String, fromUser: Boolean, triggerAbortCallback: Boolean) {
         val previousStep = getCurrentStep()
         cleanupAllSteps()
         currentStepIndex = -1
         executionStack.clear()
-        // 通知流程已中止
-        val stepChange = StepChange(
-            currentStep = null,
-            previousStep = previousStep,
-            currentIndex = -1,
-            totalSteps = steps.size,
-            changeType = StepChange.ChangeType.ABORTED
-        )
-        stepChangeListener(stepChange)
-        _stepChangeFlow.value = stepChange
+
+        if (triggerAbortCallback) {
+            onAbort?.invoke(reason, fromUser)
+        }
 
         // 完成等待
         completionDeferred?.complete(null)
@@ -280,7 +288,7 @@ class StepEngine<T> internal constructor(
         
         if (executionStack.isEmpty()) {
             // 已经是第一个步骤，中止流程
-            abort(fromUser = true)
+            abort(reason = "Navigated back from first step", fromUser = true)
             return
         }
         
@@ -396,9 +404,9 @@ class StepEngine<T> internal constructor(
         override suspend fun navigateBack() {
             navigateBackToPreviousStep()
         }
-        
-        override suspend fun abortStep(fromUser: Boolean) {
-            abort(fromUser)
+
+        override suspend fun abortStep(reason: String, fromUser: Boolean) {
+            abort(reason, fromUser)
         }
         
         override suspend fun error(exception: Throwable) {

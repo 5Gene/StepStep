@@ -39,20 +39,17 @@ data class StepChange<T>(
      * 步骤变化类型
      */
     enum class ChangeType {
-        /** 前进到下一个步骤 */
-        FORWARD,
-        
-        /** 返回到上一个步骤 */
-        BACKWARD,
-        
         /** 流程开始 */
         STARTED,
-        
+
+        /** 前进到下一个步骤 */
+        FORWARD,
+
+        /** 返回到上一个步骤 */
+        BACKWARD,
+
         /** 流程完成 */
-        COMPLETED,
-        
-        /** 流程中止 */
-        ABORTED
+        COMPLETED
     }
     
     /**
@@ -70,9 +67,5 @@ data class StepChange<T>(
      */
     fun isCompleted(): Boolean = changeType == ChangeType.COMPLETED
     
-    /**
-     * 是否已中止
-     */
-    fun isAborted(): Boolean = changeType == ChangeType.ABORTED
 }
 
