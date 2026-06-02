@@ -13,7 +13,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.github.5hmlA.vcl") version "2026.05.26"
+    id("io.github.5hmlA.vcl") version "2026.06.01"
 }
 
 dependencyResolutionManagement {
